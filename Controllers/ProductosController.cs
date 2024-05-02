@@ -43,6 +43,7 @@ namespace FinalTest.Controllers
                         .Include(ps => ps.ProductCategory)
                         .FirstOrDefault(ps => ps.ProductSubcategoryId == product.ProductSubcategoryId);
 
+
                     if (categoriaProducto != null)
                     {
                         // Aplicar filtros opcionales
