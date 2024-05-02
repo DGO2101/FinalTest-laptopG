@@ -16,8 +16,10 @@ namespace FinalTest.Controllers
         {
             _context = context;
         }
+
+
         [HttpGet("productos-mas-vendidos")]
-        public IActionResult ObtenerProductosMasVendidos(int numeroProductos)
+        public IActionResult ObtenerProductosMasVendidos(int numeroProductos, string color = null, string tamaño = null, string peso = null)
         {
             var productosMasVendidos = _context.SalesOrderDetails
                 .GroupBy(sod => sod.ProductId)
@@ -37,34 +39,55 @@ namespace FinalTest.Controllers
                 var product = _context.Products.FirstOrDefault(p => p.ProductId == producto.ProductID);
                 if (product != null)
                 {
-                    var categoria = _context.ProductSubcategories
+                    var categoriaProducto = _context.ProductSubcategories
                         .Include(ps => ps.ProductCategory)
                         .FirstOrDefault(ps => ps.ProductSubcategoryId == product.ProductSubcategoryId);
 
-                    if (categoria != null)
+                    if (categoriaProducto != null)
                     {
-                        var ventasCategoria = _context.SalesOrderDetails
-                            .Where(sod => sod.ProductId == product.ProductId)
-                            .Sum(sod => sod.OrderQty);
+                        // Aplicar filtros opcionales
+                        if ((!string.IsNullOrEmpty(color) && product.Color != color) ||
+                            (!string.IsNullOrEmpty(tamaño) && product.Size != tamaño) ||
+                            (!string.IsNullOrEmpty(peso) && product.Weight != Convert.ToDecimal(peso)))
+                        {
+                            continue;
+                        }
 
-                        var contribucionPorcentualCategoria = (double)ventasCategoria / _context.SalesOrderDetails.Sum(sod => sod.OrderQty) * 100;
+                        var categoryId = categoriaProducto.ProductCategoryId;
+                        var categoryName = categoriaProducto.ProductCategory.Name;
+
+                        var productosMismaCategoria = _context.Products
+                            .Where(p => p.ProductSubcategoryId == categoriaProducto.ProductSubcategoryId)
+                            .Select(p => p.ProductId)
+                            .ToList();
+
+                        var ventasCategoria = _context.SalesOrderDetails
+                            .Where(sod => productosMismaCategoria.Contains(sod.ProductId))
+                            .Sum(sod => sod.OrderQty);
 
                         resultado.Add(new
                         {
+                            tamaño = product.Size,
+                            peso = product.Weight,
+                            Color = product.Color,
                             ProductoID = producto.ProductID,
                             NombreProducto = product.Name,
-                            NombreCategoria = categoria.ProductCategory.Name,
+                            NombreCategoria = categoriaProducto.ProductCategory.Name,
                             VentasTotales = producto.TotalVentas,
                             ContribucionPorcentualVenta = producto.ContribucionPorcentualVenta,
-                            //VentasCategoria = ventasCategoria,
-                            //ContribucionPorcentualCategoria = contribucionPorcentualCategoria
+                            VentasCategoria = ventasCategoria,
+                            // ContribucionPorcentualCategoria = contribucionPorcentualCategoria
                         });
                     }
                 }
             }
-
+            var resultados = productosMasVendidos.OrderByDescending(g => g.TotalVentas)
+                .Take(numeroProductos)
+                .ToList();
             return Ok(resultado);
         }
+
+
 
         [HttpGet("sales-report")]
         public IActionResult GetSalesReport(int numberOfRows, string color = null, string tamaño = null, string billCity = null)
