@@ -1,0 +1,27 @@
+﻿@model IEnumerable<FinalTest.Models.ObtenerProductosMasVendidosViewModel>
+
+<h2>Productos Más Vendidos</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Ventas Totales</th>
+            <th>Contribución %</th>
+            <!-- Agrega más columnas según necesites -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var producto in Model)
+        {
+            <tr>
+                <td>@producto.ProductoID</td>
+                <td>@producto.NombreProducto</td>
+                <td>@producto.VentasTotales</td>
+                <td>@producto.ContribucionPorcentualVenta</td>
+                <!-- Agrega más celdas según las propiedades de tu ViewModel -->
+            </tr>
+        }
+    </tbody>
+</table>
+

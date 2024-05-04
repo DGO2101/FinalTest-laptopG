@@ -1,0 +1,41 @@
+﻿@model IEnumerable<dynamic> 
+
+<h2>Reporte de Ventas</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID de Venta</th>
+            <th>Fecha de Orden</th>
+            <th>ID de Cliente</th>
+            <th>ID de Producto</th>
+            <th>Categoría del Producto</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Precio Total</th>
+            <th>ID de Vendedor</th>
+            <th>Nombre de Vendedor</th>
+            <th>Dirección de Envío</th>
+            <th>Dirección de Facturación</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.SalesOrderId</td>
+                <td>@item.OrderDate.ToShortDateString()</td>
+                <td>@item.CustomerId</td>
+                <td>@item.ProductId</td>
+                <td>@item.ProductCategory</td>
+                <td>@item.UnitPrice</td>
+                <td>@item.Quantity</td>
+                <td>@item.TotalPrice</td>
+                <td>@item.SalesPersonId</td>
+                <td>@item.SalesPersonName</td>
+                <td>@item.ShipToAddress</td>
+                <td>@item.BillToAddress</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
