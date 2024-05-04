@@ -19,87 +19,87 @@ namespace FinalTest.Controllers
         }
 
 
-        //[HttpGet("productos-mas-vendidos")]
-        //public IActionResult ObtenerProductosMasVendidos(int numeroProductos, string color = null, string tamaño = null, string peso = null)
-        //{
-        //    var productosMasVendidos = _context.SalesOrderDetails
-        //        .GroupBy(sod => sod.ProductId)
-        //        .Select(g => new
-        //        {
-        //            ProductID = g.Key,
-        //            TotalVentas = g.Sum(sod => sod.OrderQty),
-        //            ContribucionPorcentualVenta = (double)g.Sum(sod => sod.OrderQty) / _context.SalesOrderDetails.Sum(sod => sod.OrderQty) * 100
-        //        })
-        //        .OrderByDescending(g => g.TotalVentas)
-        //        .Take(numeroProductos)
-        //        .ToList();
+        [HttpGet("productos-mas-vendidos")]
+        public IActionResult ObtenerProductosMasVendidos(int numeroProductos, string color = null, string tamaño = null, string peso = null)
+        {
+            var productosMasVendidos = _context.SalesOrderDetails
+                .GroupBy(sod => sod.ProductId)
+                .Select(g => new
+                {
+                    ProductID = g.Key,
+                    TotalVentas = g.Sum(sod => sod.OrderQty),
+                    ContribucionPorcentualVenta = (double)g.Sum(sod => sod.OrderQty) / _context.SalesOrderDetails.Sum(sod => sod.OrderQty) * 100
+                })
+                .OrderByDescending(g => g.TotalVentas)
+                .Take(numeroProductos)
+                .ToList();
 
-        //    var resultado = new List<object>();
-        //    var ProductosViewModel = new List<object>();
-        //    foreach (var producto in productosMasVendidos)
-        //    {
-        //        var product = _context.Products.FirstOrDefault(p => p.ProductId == producto.ProductID);
-        //        if (product != null)
-        //        {
-        //            var categoriaProducto = _context.ProductSubcategories
-        //                .Include(ps => ps.ProductCategory)
-        //                .FirstOrDefault(ps => ps.ProductSubcategoryId == product.ProductSubcategoryId);
+            var resultado = new List<object>();
+            var ProductosViewModel = new List<object>();
+            foreach (var producto in productosMasVendidos)
+            {
+                var product = _context.Products.FirstOrDefault(p => p.ProductId == producto.ProductID);
+                if (product != null)
+                {
+                    var categoriaProducto = _context.ProductSubcategories
+                        .Include(ps => ps.ProductCategory)
+                        .FirstOrDefault(ps => ps.ProductSubcategoryId == product.ProductSubcategoryId);
 
 
-        //            if (categoriaProducto != null)
-        //            {
-        //                // Aplicar filtros opcionales
-        //                if ((!string.IsNullOrEmpty(color) && product.Color != color) ||
-        //                    (!string.IsNullOrEmpty(tamaño) && product.Size != tamaño) ||
-        //                    (!string.IsNullOrEmpty(peso) && product.Weight != Convert.ToDecimal(peso)))
-        //                {
-        //                    continue;
-        //                }
+                    if (categoriaProducto != null)
+                    {
+                        // Aplicar filtros opcionales
+                        if ((!string.IsNullOrEmpty(color) && product.Color != color) ||
+                            (!string.IsNullOrEmpty(tamaño) && product.Size != tamaño) ||
+                            (!string.IsNullOrEmpty(peso) && product.Weight != Convert.ToDecimal(peso)))
+                        {
+                            continue;
+                        }
 
-        //                var categoryId = categoriaProducto.ProductCategoryId;
-        //                var categoryName = categoriaProducto.ProductCategory.Name;
+                        var categoryId = categoriaProducto.ProductCategoryId;
+                        var categoryName = categoriaProducto.ProductCategory.Name;
 
-        //                var productosMismaCategoria = _context.Products
-        //                    .Where(p => p.ProductSubcategoryId == categoriaProducto.ProductSubcategoryId)
-        //                    .Select(p => p.ProductId)
-        //                    .ToList();
+                        var productosMismaCategoria = _context.Products
+                            .Where(p => p.ProductSubcategoryId == categoriaProducto.ProductSubcategoryId)
+                            .Select(p => p.ProductId)
+                            .ToList();
 
-        //                var ventasCategoria = _context.SalesOrderDetails
-        //                    .Where(sod => productosMismaCategoria.Contains(sod.ProductId))
-        //                    .Sum(sod => sod.OrderQty);
+                        var ventasCategoria = _context.SalesOrderDetails
+                            .Where(sod => productosMismaCategoria.Contains(sod.ProductId))
+                            .Sum(sod => sod.OrderQty);
 
-        //                resultado.Add(new
-        //                {
-        //                    tamaño = product.Size,
-        //                    peso = product.Weight,
-        //                    Color = product.Color,
-        //                    ProductoID = producto.ProductID,
-        //                    NombreProducto = product.Name,
-        //                    NombreCategoria = categoriaProducto.ProductCategory.Name,
-        //                    VentasTotales = producto.TotalVentas,
-        //                    ContribucionPorcentualVenta = producto.ContribucionPorcentualVenta,
-        //                    VentasCategoria = ventasCategoria,
-        //                    // ContribucionPorcentualCategoria = contribucionPorcentualCategoria
-        //                });
-        //                ProductosViewModel = resultado.Select(producto => new ObtenerProductosMasVendidosViewModel
-        //                {
-        //                    ProductoID = producto.ProductID,
-        //                    NombreProducto = producto.NombreProducto,
-        //                    NombreCategoria = producto.NombreCategoria,
-        //                    VentasTotales = producto.VentasTotales,
-        //                    ContribucionPorcentualVenta = producto.ContribucionPorcentualVenta,
-        //                    VentasCategoria = producto.VentasCategoria,
-        //                    // Inicializa aquí cualquier otra propiedad que hayas agregado al ViewModel
-        //                }).ToList();
-        //            }
-        //        }
-        //    }
-        //    var resultados = productosMasVendidos.OrderByDescending(g => g.TotalVentas)
-        //        .Take(numeroProductos)
-        //        .ToList();
-        //    //return View()
+                        resultado.Add(new
+                        {
+                            tamaño = product.Size,
+                            peso = product.Weight,
+                            Color = product.Color,
+                            ProductoID = producto.ProductID,
+                            NombreProducto = product.Name,
+                            NombreCategoria = categoriaProducto.ProductCategory.Name,
+                            VentasTotales = producto.TotalVentas,
+                            ContribucionPorcentualVenta = producto.ContribucionPorcentualVenta,
+                            VentasCategoria = ventasCategoria,
+                            // ContribucionPorcentualCategoria = contribucionPorcentualCategoria
+                        });
+                        //ProductosViewModel = resultado.Select(producto => new ObtenerProductosMasVendidosViewModel
+                        //{
+                        //    ProductoID = producto.ProductID,
+                        //    NombreProducto = producto.NombreProducto,
+                        //    NombreCategoria = producto.NombreCategoria,
+                        //    VentasTotales = producto.VentasTotales,
+                        //    ContribucionPorcentualVenta = producto.ContribucionPorcentualVenta,
+                        //    VentasCategoria = producto.VentasCategoria,
+                        //    // Inicializa aquí cualquier otra propiedad que hayas agregado al ViewModel
+                        //}).ToList();
+                    }
+                }
+            }
+            var resultados = productosMasVendidos.OrderByDescending(g => g.TotalVentas)
+                .Take(numeroProductos)
+                .ToList();
+            return Ok(resultado);
 
-        //}
+        }
 
 
 
@@ -171,7 +171,7 @@ namespace FinalTest.Controllers
     })
     .ToList();
 
-            return View("SalesReport", salesReportViewModelList);
+            return Ok(salesReport);
         }
 
 
